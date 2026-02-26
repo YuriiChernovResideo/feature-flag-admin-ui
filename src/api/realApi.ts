@@ -8,6 +8,18 @@ const axiosInstance: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Handle backend error responses (400, 404, etc.) that contain structured errors
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.data?.errors?.length > 0) {
+      // Backend returned structured ApiResponse with errors — return as normal response
+      return { data: error.response.data };
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Token will be set externally via setAuthToken
 let authToken: string | null = null;
 
